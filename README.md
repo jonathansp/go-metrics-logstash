@@ -26,7 +26,8 @@ func main() {
 	registry := metrics.NewRegistry()
 	reporter, err := logstash.NewReporter(
 		registry,         // go-metrics registry, or nil
-		"127.0.0.1:1984", // logstash UDP address
+		"127.0.0.1:1984", // logstash UDP address,
+		"my-app",		  // reporter's name
 	)
 	if err != nil {
 		log.Fatal(err)
