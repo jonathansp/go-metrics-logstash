@@ -7,7 +7,8 @@ import (
 
 // Metrics represents a metric that will be sent to logstash
 type Metrics struct {
-	data map[string]interface{}
+	data   map[string]interface{}
+	metric string
 }
 
 // NewMetrics Metric{} constructor
@@ -31,13 +32,19 @@ func (m *Metrics) register(name string, value interface{}) error {
 // Gauge register a new gauge metric
 func (m *Metrics) Gauge(name string, value interface{}) error {
 	return m.register(name+".gauge", value)
-
 }
 
 // Count register a new gaugeFloat64 metric
 func (m *Metrics) Count(name string, value int64) error {
 	return m.register(name, value)
+}
 
+// Clear clears current buffer
+func (m *Metrics) Clear() {
+	m.data = map[string]interface{}{
+		"metric": m.metric,
+		"count":  1,
+	}
 }
 
 // ToJSON serializes data to json

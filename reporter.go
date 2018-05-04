@@ -13,14 +13,14 @@ type Reporter struct {
 	// Registry map is used to hold metrics that will be sent to logstash.
 	Registry metrics.Registry
 	// Conn is a UDP connection to logstash.
-	Conn net.Conn
+	Conn *net.UDPConn
 	// Name of this reporter
 	Name string
 
-	// Reporter type configuration settings
 	percentiles []float64
 	p           []string
 	ss          map[string]int64
+	udpAddr     *net.UDPAddr
 }
 
 // NewReporter creates a new Reporter with a pre-configured statsd client.
@@ -29,16 +29,23 @@ func NewReporter(r metrics.Registry, addr string, name string) (*Reporter, error
 		r = metrics.DefaultRegistry
 	}
 
-	conn, err := net.Dial("udp", addr)
+	udpAddr, err := net.ResolveUDPAddr("udp", addr)
 	if err != nil {
 		return nil, err
 	}
+	conn, err := net.DialUDP("udp4", nil, udpAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	conn.SetWriteBuffer(2048)
 
 	return &Reporter{
 		Conn:     conn,
 		Registry: r,
 		Name:     name,
 
+		udpAddr:     udpAddr,
 		percentiles: []float64{0.50, 0.75, 0.95, 0.99, 0.999},
 		ss:          make(map[string]int64),
 	}, nil
@@ -62,8 +69,9 @@ func (r *Reporter) FlushEach(interval time.Duration) {
 
 // FlushOnce submits a snapshot submission of the registry.
 func (r *Reporter) FlushOnce() error {
+	m := NewMetrics(r.Name)
+
 	r.Registry.Each(func(name string, i interface{}) {
-		m := NewMetrics(r.Name)
 
 		switch metric := i.(type) {
 		case metrics.Counter:
@@ -116,10 +124,10 @@ func (r *Reporter) FlushOnce() error {
 					m.Gauge(name+p, time.Duration(values[i]).Seconds()*1000)
 				}
 			}
-
 		}
-		r.Conn.Write(m.ToJSON())
 	})
+	r.Conn.Write(m.ToJSON())
+	m.Clear()
 
 	return nil
 }
