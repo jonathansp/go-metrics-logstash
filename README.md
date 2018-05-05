@@ -19,7 +19,7 @@ import (
 	"time"
 
 	metrics "github.com/rcrowley/go-metrics"
-	logstash "github.com/jonathansp/go-metrics-logstash"
+	"github.com/jonathansp/go-metrics-logstash"
 )
 
 func main() {
@@ -27,7 +27,7 @@ func main() {
 	reporter, err := logstash.NewReporter(
 		registry,         // go-metrics registry, or nil
 		"127.0.0.1:1984", // logstash UDP address,
-		"my-app",		  // reporter's name
+		"my-app",         // reporter's name
 	)
 	if err != nil {
 		log.Fatal(err)
