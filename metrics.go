@@ -3,12 +3,14 @@ package logstash
 import (
 	"encoding/json"
 	"errors"
+	"sync"
 )
 
 // Metrics represents a metric that will be sent to logstash
 type Metrics struct {
 	data   map[string]interface{}
 	metric string
+	sync.RWMutex
 }
 
 // NewMetrics Metric{} constructor
@@ -22,6 +24,9 @@ func NewMetrics(metric string) *Metrics {
 }
 
 func (m *Metrics) register(name string, value interface{}) error {
+	m.RLock()
+	defer m.RUnlock()
+
 	if name == "" {
 		return errors.New("Invalid metric name")
 	}
@@ -50,6 +55,5 @@ func (m *Metrics) Clear() {
 // ToJSON serializes data to json
 func (m *Metrics) ToJSON() []byte {
 	data, _ := json.Marshal(m.data)
-	data = append(data, "\n"...)
 	return data
 }

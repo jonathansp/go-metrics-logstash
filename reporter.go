@@ -38,8 +38,6 @@ func NewReporter(r metrics.Registry, addr string, name string) (*Reporter, error
 		return nil, err
 	}
 
-	conn.SetWriteBuffer(2048)
-
 	return &Reporter{
 		Conn:     conn,
 		Registry: r,
@@ -67,12 +65,11 @@ func (r *Reporter) FlushEach(interval time.Duration) {
 	}
 }
 
-// FlushOnce submits a snapshot submission of the registry.
+// FlushOnce submits a snapshot of the registry.
 func (r *Reporter) FlushOnce() error {
 	m := NewMetrics(r.Name)
 
 	r.Registry.Each(func(name string, i interface{}) {
-
 		switch metric := i.(type) {
 		case metrics.Counter:
 			v := metric.Count()
@@ -128,6 +125,5 @@ func (r *Reporter) FlushOnce() error {
 	})
 	r.Conn.Write(m.ToJSON())
 	m.Clear()
-
 	return nil
 }
