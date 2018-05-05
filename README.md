@@ -24,6 +24,10 @@ import (
 
 func main() {
 	registry := metrics.NewRegistry()
+
+	metrics.RegisterDebugGCStats(registry)
+	metrics.RegisterRuntimeMemStats(registry)
+
 	reporter, err := logstash.NewReporter(
 		registry,         // go-metrics registry, or nil
 		"127.0.0.1:1984", // logstash UDP address,
