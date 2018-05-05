@@ -15,7 +15,8 @@ type Reporter struct {
 	// Conn is a UDP connection to logstash.
 	Conn *net.UDPConn
 	// Name of this reporter
-	Name string
+	Name    string
+	Version string
 
 	percentiles []float64
 	p           []string
@@ -42,6 +43,7 @@ func NewReporter(r metrics.Registry, addr string, name string) (*Reporter, error
 		Conn:     conn,
 		Registry: r,
 		Name:     name,
+		Version:  "0.1.0",
 
 		udpAddr:     udpAddr,
 		percentiles: []float64{0.50, 0.75, 0.95, 0.99, 0.999},
