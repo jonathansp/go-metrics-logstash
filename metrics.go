@@ -8,18 +8,23 @@ import (
 
 // Metrics represents a metric that will be sent to logstash
 type Metrics struct {
-	data   map[string]interface{}
-	metric string
+	data map[string]interface{}
+	name string
 	sync.RWMutex
 }
 
 // NewMetrics Metric{} constructor
-func NewMetrics(metric string) *Metrics {
+func NewMetrics(name string) *Metrics {
 	return &Metrics{
-		data: map[string]interface{}{
-			"metric": metric,
-			"count":  1,
-		},
+		data: new(name),
+	}
+}
+
+func new(name string) map[string]interface{} {
+	return map[string]interface{}{
+		"metric": "doc",
+		"client": name,
+		"count":  1,
 	}
 }
 
@@ -46,10 +51,7 @@ func (m *Metrics) Count(name string, value int64) error {
 
 // Clear clears current buffer
 func (m *Metrics) Clear() {
-	m.data = map[string]interface{}{
-		"metric": m.metric,
-		"count":  1,
-	}
+	m.data = new(m.name)
 }
 
 // ToJSON serializes data to json
