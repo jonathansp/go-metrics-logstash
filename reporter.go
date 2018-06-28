@@ -72,50 +72,50 @@ func (r *Reporter) FlushOnce() error {
 	r.Registry.Each(func(name string, i interface{}) {
 		switch metric := i.(type) {
 		case metrics.Counter:
-			m.Count(name, metric.Count())
+			m.Register(name, metric.Count())
 
 		case metrics.Gauge:
-			m.Gauge(name, float64(metric.Value()))
+			m.Register(name, float64(metric.Value()))
 
 		case metrics.GaugeFloat64:
-			m.Gauge(name, metric.Value())
+			m.Register(name, metric.Value())
 
 		case metrics.Histogram:
 			ms := metric.Snapshot()
-			m.Gauge(name+".count", float64(ms.Count()))
-			m.Gauge(name+".max", float64(ms.Max()))
-			m.Gauge(name+".min", float64(ms.Min()))
-			m.Gauge(name+".mean", ms.Mean())
-			m.Gauge(name+".stddev", ms.StdDev())
-			m.Gauge(name+".var", ms.Variance())
+			m.Register(name+".count", float64(ms.Count()))
+			m.Register(name+".max", float64(ms.Max()))
+			m.Register(name+".min", float64(ms.Min()))
+			m.Register(name+".mean", ms.Mean())
+			m.Register(name+".stddev", ms.StdDev())
+			m.Register(name+".var", ms.Variance())
 
 			if len(r.percentiles) > 0 {
 				values := ms.Percentiles(r.percentiles)
 				for i, p := range r.p {
-					m.Gauge(name+p, values[i])
+					m.Register(name+p, values[i])
 				}
 			}
 
 		case metrics.Meter:
 			ms := metric.Snapshot()
-			m.Gauge(name+".count", float64(ms.Count()))
-			m.Gauge(name+".rate1", ms.Rate1())
-			m.Gauge(name+".rate5", ms.Rate5())
-			m.Gauge(name+".rate15", ms.Rate15())
-			m.Gauge(name+".mean", ms.RateMean())
+			m.Register(name+".count", float64(ms.Count()))
+			m.Register(name+".rate1", ms.Rate1())
+			m.Register(name+".rate5", ms.Rate5())
+			m.Register(name+".rate15", ms.Rate15())
+			m.Register(name+".mean", ms.RateMean())
 
 		case metrics.Timer:
 			ms := metric.Snapshot()
-			m.Gauge(name+".count", float64(ms.Count()))
-			m.Gauge(name+".max", time.Duration(ms.Max()).Seconds()*1000)
-			m.Gauge(name+".min", time.Duration(ms.Min()).Seconds()*1000)
-			m.Gauge(name+".mean", time.Duration(ms.Mean()).Seconds()*1000)
-			m.Gauge(name+".stddev", time.Duration(ms.StdDev()).Seconds()*1000)
+			m.Register(name+".count", float64(ms.Count()))
+			m.Register(name+".max", time.Duration(ms.Max()).Seconds()*1000)
+			m.Register(name+".min", time.Duration(ms.Min()).Seconds()*1000)
+			m.Register(name+".mean", time.Duration(ms.Mean()).Seconds()*1000)
+			m.Register(name+".stddev", time.Duration(ms.StdDev()).Seconds()*1000)
 
 			if len(r.percentiles) > 0 {
 				values := ms.Percentiles(r.percentiles)
 				for i, p := range r.p {
-					m.Gauge(name+p, time.Duration(values[i]).Seconds()*1000)
+					m.Register(name+p, time.Duration(values[i]).Seconds()*1000)
 				}
 			}
 		}

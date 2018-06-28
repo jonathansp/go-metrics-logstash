@@ -28,7 +28,8 @@ func new(name string) map[string]interface{} {
 	}
 }
 
-func (m *Metrics) register(name string, value interface{}) error {
+// Register registers a new metric
+func (m *Metrics) Register(name string, value interface{}) error {
 	m.RLock()
 	defer m.RUnlock()
 
@@ -37,16 +38,6 @@ func (m *Metrics) register(name string, value interface{}) error {
 	}
 	m.data[name] = value
 	return nil
-}
-
-// Gauge register a new gauge metric
-func (m *Metrics) Gauge(name string, value interface{}) error {
-	return m.register(name, value)
-}
-
-// Count register a new gaugeFloat64 metric
-func (m *Metrics) Count(name string, value int64) error {
-	return m.register(name, value)
 }
 
 // ToJSON serializes data to json
