@@ -126,6 +126,5 @@ func (r *Reporter) FlushOnce() error {
 		}
 	})
 	r.Conn.Write(m.ToJSON())
-	m.Clear()
 	return nil
 }

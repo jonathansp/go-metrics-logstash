@@ -49,11 +49,6 @@ func (m *Metrics) Count(name string, value int64) error {
 	return m.register(name, value)
 }
 
-// Clear clears current buffer
-func (m *Metrics) Clear() {
-	m.data = new(m.name)
-}
-
 // ToJSON serializes data to json
 func (m *Metrics) ToJSON() []byte {
 	data, _ := json.Marshal(m.data)
