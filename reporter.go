@@ -1,6 +1,7 @@
 package logstash
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"time"
@@ -82,12 +83,12 @@ func (r *Reporter) FlushOnce() error {
 
 		case metrics.Histogram:
 			ms := metric.Snapshot()
-			m.Register(name+".count", float64(ms.Count()))
-			m.Register(name+".max", float64(ms.Max()))
-			m.Register(name+".min", float64(ms.Min()))
-			m.Register(name+".mean", ms.Mean())
-			m.Register(name+".stddev", ms.StdDev())
-			m.Register(name+".var", ms.Variance())
+			m.Register(fmt.Sprintf("%s.count", name), float64(ms.Count()))
+			m.Register(fmt.Sprintf("%s.max", name), float64(ms.Max()))
+			m.Register(fmt.Sprintf("%s.min", name), float64(ms.Min()))
+			m.Register(fmt.Sprintf("%s.mean", name), ms.Mean())
+			m.Register(fmt.Sprintf("%s.stddev", name), ms.StdDev())
+			m.Register(fmt.Sprintf("%s.var", name), ms.Variance())
 
 			if len(r.percentiles) > 0 {
 				values := ms.Percentiles(r.percentiles)
@@ -98,19 +99,19 @@ func (r *Reporter) FlushOnce() error {
 
 		case metrics.Meter:
 			ms := metric.Snapshot()
-			m.Register(name+".count", float64(ms.Count()))
-			m.Register(name+".rate1", ms.Rate1())
-			m.Register(name+".rate5", ms.Rate5())
-			m.Register(name+".rate15", ms.Rate15())
-			m.Register(name+".mean", ms.RateMean())
+			m.Register(fmt.Sprintf("%s.count", name), float64(ms.Count()))
+			m.Register(fmt.Sprintf("%s.rate1", name), ms.Rate1())
+			m.Register(fmt.Sprintf("%s.rate5", name), ms.Rate5())
+			m.Register(fmt.Sprintf("%s.rate15", name), ms.Rate15())
+			m.Register(fmt.Sprintf("%s.mean", name), ms.RateMean())
 
 		case metrics.Timer:
 			ms := metric.Snapshot()
-			m.Register(name+".count", float64(ms.Count()))
-			m.Register(name+".max", time.Duration(ms.Max()).Seconds()*1000)
-			m.Register(name+".min", time.Duration(ms.Min()).Seconds()*1000)
-			m.Register(name+".mean", time.Duration(ms.Mean()).Seconds()*1000)
-			m.Register(name+".stddev", time.Duration(ms.StdDev()).Seconds()*1000)
+			m.Register(fmt.Sprintf("%s.count", name), float64(ms.Count()))
+			m.Register(fmt.Sprintf("%s.max", name), time.Duration(ms.Max()).Seconds()*1000)
+			m.Register(fmt.Sprintf("%s.min", name), time.Duration(ms.Min()).Seconds()*1000)
+			m.Register(fmt.Sprintf("%s.mean", name), time.Duration(ms.Mean()).Seconds()*1000)
+			m.Register(fmt.Sprintf("%s.stddev", name), time.Duration(ms.StdDev()).Seconds()*1000)
 
 			if len(r.percentiles) > 0 {
 				values := ms.Percentiles(r.percentiles)
