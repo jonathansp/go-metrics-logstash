@@ -20,7 +20,6 @@ type Reporter struct {
 
 	percentiles []float64
 	p           []string
-	ss          map[string]int64
 	udpAddr     *net.UDPAddr
 }
 
@@ -47,7 +46,6 @@ func NewReporter(r metrics.Registry, addr string, name string) (*Reporter, error
 
 		udpAddr:     udpAddr,
 		percentiles: []float64{0.50, 0.75, 0.95, 0.99, 0.999},
-		ss:          make(map[string]int64),
 	}, nil
 }
 
@@ -74,10 +72,7 @@ func (r *Reporter) FlushOnce() error {
 	r.Registry.Each(func(name string, i interface{}) {
 		switch metric := i.(type) {
 		case metrics.Counter:
-			v := metric.Count()
-			l := r.ss[name]
-			m.Count(name, v-l)
-			r.ss[name] = v
+			m.Count(name, metric.Count())
 
 		case metrics.Gauge:
 			m.Gauge(name, float64(metric.Value()))
