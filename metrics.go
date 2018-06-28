@@ -41,7 +41,7 @@ func (m *Metrics) register(name string, value interface{}) error {
 
 // Gauge register a new gauge metric
 func (m *Metrics) Gauge(name string, value interface{}) error {
-	return m.register(name+".gauge", value)
+	return m.register(name, value)
 }
 
 // Count register a new gaugeFloat64 metric
