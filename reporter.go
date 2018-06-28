@@ -20,7 +20,6 @@ type Reporter struct {
 	Version string
 
 	percentiles []float64
-	p           []string
 	udpAddr     *net.UDPAddr
 }
 
@@ -90,11 +89,8 @@ func (r *Reporter) FlushOnce() error {
 			m.Register(fmt.Sprintf("%s.stddev", name), ms.StdDev())
 			m.Register(fmt.Sprintf("%s.var", name), ms.Variance())
 
-			if len(r.percentiles) > 0 {
-				values := ms.Percentiles(r.percentiles)
-				for i, p := range r.p {
-					m.Register(name+p, values[i])
-				}
+			for _, p := range r.percentiles {
+				m.Register(fmt.Sprintf("%s.p%g", name, p*100), ms.Percentile(p))
 			}
 
 		case metrics.Meter:
@@ -113,11 +109,9 @@ func (r *Reporter) FlushOnce() error {
 			m.Register(fmt.Sprintf("%s.mean", name), time.Duration(ms.Mean()).Seconds()*1000)
 			m.Register(fmt.Sprintf("%s.stddev", name), time.Duration(ms.StdDev()).Seconds()*1000)
 
-			if len(r.percentiles) > 0 {
-				values := ms.Percentiles(r.percentiles)
-				for i, p := range r.p {
-					m.Register(name+p, time.Duration(values[i]).Seconds()*1000)
-				}
+			for _, p := range r.percentiles {
+				duration := time.Duration(ms.Percentile(p)).Seconds() * 1000
+				m.Register(fmt.Sprintf("%s.p%g", name, p*100), duration)
 			}
 		}
 	})
