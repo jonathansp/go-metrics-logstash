@@ -72,7 +72,7 @@ func (r *Reporter) FlushOnce() error {
 	r.Registry.Each(func(name string, i interface{}) {
 		switch metric := i.(type) {
 		case metrics.Counter:
-			m.Register(name, metric.Count())
+			m.Register(fmt.Sprintf("%s.count", name), metric.Count())
 
 		case metrics.Gauge:
 			m.Register(name, float64(metric.Value()))
