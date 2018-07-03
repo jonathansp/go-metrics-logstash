@@ -86,7 +86,7 @@ func TestFlushOnce(t *testing.T) {
 		"test.histogram.p75": 10,
 		"test.histogram.p95": 10,
 		"test.histogram.p99": 10,
-		"test.histogram.p99.9": 10
+		"test.histogram.p99_9": 10
 	}`
 	assert.JSONEq(t, expected, received)
 }
@@ -144,7 +144,7 @@ func TestFlushOnceKeepsPreviousValues(t *testing.T) {
 		"test.histogram.p75": 12,
 		"test.histogram.p95": 12,
 		"test.histogram.p99": 12,
-		"test.histogram.p99.9": 12
+		"test.histogram.p99_9": 12
 	}`
 	assert.JSONEq(t, expected, received)
 }

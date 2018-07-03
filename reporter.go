@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 	"time"
 
 	metrics "github.com/rcrowley/go-metrics"
@@ -90,7 +91,8 @@ func (r *Reporter) FlushOnce() error {
 			m.Register(fmt.Sprintf("%s.var", name), ms.Variance())
 
 			for _, p := range r.percentiles {
-				m.Register(fmt.Sprintf("%s.p%g", name, p*100), ms.Percentile(p))
+				pStr := strings.Replace(fmt.Sprintf("p%g", p*100), ".", "_", -1)
+				m.Register(fmt.Sprintf("%s.%s", name, pStr), ms.Percentile(p))
 			}
 
 		case metrics.Meter:
