@@ -29,9 +29,11 @@ func main() {
 	metrics.RegisterRuntimeMemStats(registry)
 
 	reporter, err := logstash.NewReporter(
-		registry,         // go-metrics registry, or nil
-		"127.0.0.1:1984", // logstash UDP address,
-		"my-app",         // reporter's name
+		registry,               // go-metrics registry, or nil
+		"127.0.0.1:1984",       // logstash UDP address,
+		map[string]interface{}{ // default values to be sent at each flush
+			"client": "my-app",
+		}
 	)
 	if err != nil {
 		log.Fatal(err)
