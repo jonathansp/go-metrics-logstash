@@ -52,7 +52,7 @@ func NewReporter(r metrics.Registry, addr string, defaultValues map[string]inter
 }
 
 // FlushEach is a blocking exporter function which reports metrics in the registry.
-// Designed to be used in a goroutine: go reporter.Flush()
+// Designed to be used in a goroutine: go reporter.FlushEach()
 func (r *Reporter) FlushEach(interval time.Duration) {
 	defer func() {
 		if rec := recover(); rec != nil {
