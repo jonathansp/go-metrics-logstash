@@ -49,7 +49,7 @@ func TestFlushOnce(t *testing.T) {
 	defer server.Close()
 
 	registry := metrics.NewRegistry()
-	reporter, err := NewReporter(registry, serverAddr, "dummy-client")
+	reporter, err := NewReporter(registry, serverAddr, nil)
 
 	// Insert metrics
 	metrics.GetOrRegisterCounter("test_counter", registry).Inc(6)
@@ -70,9 +70,6 @@ func TestFlushOnce(t *testing.T) {
 	}
 
 	expected := `{
-		"metric": "doc",
-		"client":"dummy-client",
-		"count":  1,
 		"test_counter.count": 8,
 		"test_gauge": 3,
 		"test_gaugeFloat64": 5,
@@ -100,7 +97,7 @@ func TestFlushOnceKeepsPreviousValues(t *testing.T) {
 	defer server.Close()
 
 	registry := metrics.NewRegistry()
-	reporter, err := NewReporter(registry, serverAddr, "dummy-client")
+	reporter, err := NewReporter(registry, serverAddr, nil)
 
 	// Insert metrics
 	sample := metrics.NewUniformSample(3)
@@ -128,9 +125,6 @@ func TestFlushOnceKeepsPreviousValues(t *testing.T) {
 	}
 
 	expected := `{
-		"metric": "doc",
-		"client":"dummy-client",
-		"count":  1,
 		"test_counter.count": 12,
 		"test_gauge": 8,
 		"test_gaugeFloat64": 9,
@@ -145,6 +139,37 @@ func TestFlushOnceKeepsPreviousValues(t *testing.T) {
 		"test_histogram.p95": 12,
 		"test_histogram.p99": 12,
 		"test_histogram.p99_9": 12
+	}`
+	assert.JSONEq(t, expected, received)
+}
+
+func TestFlushOnceWithDefaultValues(t *testing.T) {
+	serverAddr := "localhost:1984"
+	server, err := newUDPServer(1984)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer server.Close()
+
+	registry := metrics.NewRegistry()
+	reporter, err := NewReporter(registry, serverAddr, map[string]interface{}{
+		"client": "dummy-client",
+		"metric": "doc",
+	})
+
+	// Insert metrics
+	metrics.GetOrRegisterCounter("test_counter", registry).Inc(6)
+	reporter.FlushOnce()
+
+	received, err := server.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := `{
+		"client":"dummy-client",
+		"metric": "doc",
+		"test_counter.count": 6
 	}`
 	assert.JSONEq(t, expected, received)
 }

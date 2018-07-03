@@ -17,16 +17,16 @@ type Reporter struct {
 	Registry metrics.Registry
 	// Conn is a UDP connection to logstash.
 	Conn *net.UDPConn
-	// Name of this reporter
-	Name    string
-	Version string
+	// DefaultValues are the values that will be sent in all submits.
+	DefaultValues map[string]interface{}
+	Version       string
 
 	percentiles []float64
 	udpAddr     *net.UDPAddr
 }
 
-// NewReporter creates a new Reporter with a pre-configured statsd client.
-func NewReporter(r metrics.Registry, addr string, name string) (*Reporter, error) {
+// NewReporter creates a new Reporter with an UDP client to the given logstash address.
+func NewReporter(r metrics.Registry, addr string, defaultValues map[string]interface{}) (*Reporter, error) {
 	if r == nil {
 		r = metrics.DefaultRegistry
 	}
@@ -41,10 +41,10 @@ func NewReporter(r metrics.Registry, addr string, name string) (*Reporter, error
 	}
 
 	return &Reporter{
-		Conn:     conn,
-		Registry: r,
-		Name:     name,
-		Version:  "0.1.1",
+		Conn:          conn,
+		Registry:      r,
+		DefaultValues: defaultValues,
+		Version:       "0.1.1",
 
 		udpAddr:     udpAddr,
 		percentiles: []float64{0.50, 0.75, 0.95, 0.99, 0.999},
@@ -69,10 +69,10 @@ func (r *Reporter) FlushEach(interval time.Duration) {
 
 // FlushOnce submits a snapshot of the registry.
 func (r *Reporter) FlushOnce() error {
-	m := map[string]interface{}{
-		"metric": "doc",
-		"client": r.Name,
-		"count":  1,
+	m := make(map[string]interface{})
+	// Copy default values
+	for k, v := range r.DefaultValues {
+		m[k] = v
 	}
 
 	r.Registry.Each(func(name string, i interface{}) {
