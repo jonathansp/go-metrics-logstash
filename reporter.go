@@ -24,7 +24,9 @@ type Reporter struct {
 	percentiles []float64
 }
 
-// NewReporter creates a new Reporter with an UDP client to the given logstash address.
+// NewReporter creates a new Reporter for the register r, with an UDP client to
+// the given logstash address addr and with the given default values. If defaultValues
+// is nil, only the metrics will be sent.
 func NewReporter(r metrics.Registry, addr string, defaultValues map[string]interface{}) (*Reporter, error) {
 	if r == nil {
 		r = metrics.DefaultRegistry
