@@ -113,7 +113,8 @@ func (r *Reporter) FlushOnce() error {
 
 			for _, p := range r.percentiles {
 				duration := time.Duration(ms.Percentile(p)).Seconds() * 1000
-				m.Register(fmt.Sprintf("%s.p%g", name, p*100), duration)
+				pStr := strings.Replace(fmt.Sprintf("p%g", p*100), ".", "_", -1)
+				m.Register(fmt.Sprintf("%s.%s", name, pStr), duration)
 			}
 		}
 	})
