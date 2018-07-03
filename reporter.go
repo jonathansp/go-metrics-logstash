@@ -22,7 +22,6 @@ type Reporter struct {
 	Version       string
 
 	percentiles []float64
-	udpAddr     *net.UDPAddr
 }
 
 // NewReporter creates a new Reporter with an UDP client to the given logstash address.
@@ -46,7 +45,6 @@ func NewReporter(r metrics.Registry, addr string, defaultValues map[string]inter
 		DefaultValues: defaultValues,
 		Version:       "0.1.1",
 
-		udpAddr:     udpAddr,
 		percentiles: []float64{0.50, 0.75, 0.95, 0.99, 0.999},
 	}, nil
 }
