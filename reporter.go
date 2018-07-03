@@ -20,8 +20,8 @@ type Reporter struct {
 	// DefaultValues are the values that will be sent in all submits.
 	DefaultValues map[string]interface{}
 	Version       string
-
-	percentiles []float64
+	// Percentiles to be sent on histograms and timers
+	Percentiles []float64
 }
 
 // NewReporter creates a new Reporter for the register r, with an UDP client to
@@ -47,7 +47,7 @@ func NewReporter(r metrics.Registry, addr string, defaultValues map[string]inter
 		DefaultValues: defaultValues,
 		Version:       "0.1.1",
 
-		percentiles: []float64{0.50, 0.75, 0.95, 0.99, 0.999},
+		Percentiles: []float64{0.50, 0.75, 0.95, 0.99, 0.999},
 	}, nil
 }
 
@@ -95,7 +95,7 @@ func (r *Reporter) FlushOnce() error {
 			m[fmt.Sprintf("%s.stddev", name)] = ms.StdDev()
 			m[fmt.Sprintf("%s.var", name)] = ms.Variance()
 
-			for _, p := range r.percentiles {
+			for _, p := range r.Percentiles {
 				pStr := strings.Replace(fmt.Sprintf("p%g", p*100), ".", "_", -1)
 				m[fmt.Sprintf("%s.%s", name, pStr)] = ms.Percentile(p)
 			}
@@ -116,7 +116,7 @@ func (r *Reporter) FlushOnce() error {
 			m[fmt.Sprintf("%s.mean", name)] = time.Duration(ms.Mean()).Seconds() * 1000
 			m[fmt.Sprintf("%s.stddev", name)] = time.Duration(ms.StdDev()).Seconds() * 1000
 
-			for _, p := range r.percentiles {
+			for _, p := range r.Percentiles {
 				duration := time.Duration(ms.Percentile(p)).Seconds() * 1000
 				pStr := strings.Replace(fmt.Sprintf("p%g", p*100), ".", "_", -1)
 				m[fmt.Sprintf("%s.%s", name, pStr)] = duration
