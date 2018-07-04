@@ -1,4 +1,4 @@
-# go-metrics logstash
+# go-metrics logstash [![Build Status](https://travis-ci.com/jonathansp/go-metrics-logstash.svg?branch=master)](https://travis-ci.com/jonathansp/go-metrics-logstash) [![GoDoc](https://godoc.org/github.com/jonathansp/go-metrics-logstash?status.svg)](http://godoc.org/github.com/jonathansp/go-metrics-logstash)
 
 This package provides a reporter for the [go-metrics](https://github.com/rcrowley/go-metrics) library that will post the metrics to logstash. This library is based on [go-metrics-datadog](https://github.com/syntaqx/go-metrics-datadog).
 
@@ -29,9 +29,11 @@ func main() {
 	metrics.RegisterRuntimeMemStats(registry)
 
 	reporter, err := logstash.NewReporter(
-		registry,         // go-metrics registry, or nil
-		"127.0.0.1:1984", // logstash UDP address,
-		"my-app",         // reporter's name
+		registry,               // go-metrics registry, or nil
+		"127.0.0.1:1984",       // logstash UDP address,
+		map[string]interface{}{ // default values to be sent at each flush
+			"client": "my-app",
+		}
 	)
 	if err != nil {
 		log.Fatal(err)
