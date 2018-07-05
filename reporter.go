@@ -45,7 +45,7 @@ func NewReporter(r metrics.Registry, addr string, defaultValues map[string]inter
 		Conn:          conn,
 		Registry:      r,
 		DefaultValues: defaultValues,
-		Version:       "0.1.1",
+		Version:       "1.0.0",
 
 		Percentiles: []float64{0.50, 0.75, 0.95, 0.99, 0.999},
 	}, nil
