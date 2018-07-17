@@ -50,6 +50,7 @@ func TestFlushOnce(t *testing.T) {
 
 	registry := metrics.NewRegistry()
 	reporter, err := NewReporter(registry, serverAddr, nil)
+	assert.NoError(t, err)
 
 	// Insert metrics
 	metrics.GetOrRegisterCounter("test_counter", registry).Inc(6)
@@ -62,7 +63,8 @@ func TestFlushOnce(t *testing.T) {
 	metrics.GetOrRegisterHistogram("test_histogram", registry, sample).Update(9)
 	metrics.GetOrRegisterHistogram("test_histogram", registry, sample).Update(10)
 	// TODO test meter and timer
-	reporter.FlushOnce()
+	err = reporter.FlushOnce()
+	assert.NoError(t, err)
 
 	received, err := server.Read()
 	if err != nil {
@@ -98,6 +100,7 @@ func TestFlushOnceKeepsPreviousValues(t *testing.T) {
 
 	registry := metrics.NewRegistry()
 	reporter, err := NewReporter(registry, serverAddr, nil)
+	assert.NoError(t, err)
 
 	// Insert metrics
 	sample := metrics.NewUniformSample(3)
@@ -117,7 +120,8 @@ func TestFlushOnceKeepsPreviousValues(t *testing.T) {
 	metrics.GetOrRegisterGaugeFloat64("test_gaugeFloat64", registry).Update(9)
 	metrics.GetOrRegisterHistogram("test_histogram", registry, sample).Update(12)
 	// TODO test meter and timer
-	reporter.FlushOnce()
+	err = reporter.FlushOnce()
+	assert.NoError(t, err)
 
 	received, err := server.Read()
 	if err != nil {
@@ -156,10 +160,12 @@ func TestFlushOnceWithDefaultValues(t *testing.T) {
 		"client": "dummy-client",
 		"metric": "doc",
 	})
+	assert.NoError(t, err)
 
 	// Insert metrics
 	metrics.GetOrRegisterCounter("test_counter", registry).Inc(6)
-	reporter.FlushOnce()
+	err = reporter.FlushOnce()
+	assert.NoError(t, err)
 
 	received, err := server.Read()
 	if err != nil {
