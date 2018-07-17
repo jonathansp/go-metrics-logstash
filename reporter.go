@@ -128,6 +128,6 @@ func (r *Reporter) FlushOnce() error {
 	if err != nil {
 		return err
 	}
-	r.Conn.Write(data)
-	return nil
+	_, err = r.Conn.Write(data)
+	return err
 }

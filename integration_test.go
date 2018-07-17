@@ -173,3 +173,18 @@ func TestFlushOnceWithDefaultValues(t *testing.T) {
 	}`
 	assert.JSONEq(t, expected, received)
 }
+
+func TestFlushOnceReturnsConnectionError(t *testing.T) {
+	serverAddr := "localhost:1984"
+
+	registry := metrics.NewRegistry()
+	reporter, err := NewReporter(registry, serverAddr, nil)
+	assert.NoError(t, err)
+
+	// Insert metrics
+	metrics.GetOrRegisterCounter("test_counter", registry).Inc(6)
+
+	reporter.Conn.Close()
+	err = reporter.FlushOnce()
+	assert.Error(t, err)
+}
